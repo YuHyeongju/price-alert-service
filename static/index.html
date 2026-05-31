@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛒 최저가 알림 서비스</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🛒 최저가 알림 서비스</h1>
+    <div id="userbar" class="hidden">
+      <span id="userEmail"></span>
+      <button id="logoutBtn" class="ghost">로그아웃</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- 로그인 / 회원가입 -->
+    <section id="authView" class="card">
+      <h2>로그인 / 회원가입</h2>
+      <input id="email" type="email" placeholder="이메일" autocomplete="username" />
+      <input id="password" type="password" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" />
+      <div class="row">
+        <button id="loginBtn">로그인</button>
+        <button id="registerBtn" class="secondary">회원가입</button>
+      </div>
+      <p class="hint">키 없이 동작하는 데모예요. 아무 이메일/비번으로 가입해보세요.</p>
+    </section>
+
+    <!-- 메인 (로그인 후) -->
+    <section id="appView" class="hidden">
+      <div class="card">
+        <h2>➕ 감시 추가</h2>
+        <div class="row">
+          <input id="query" type="text" placeholder="상품 검색어 (예: 에어팟 프로)" />
+          <input id="targetPrice" type="number" placeholder="목표가 (원)" />
+          <select id="comparison">
+            <option value="lte">이하면 알림</option>
+            <option value="gte">이상이면 알림</option>
+          </select>
+          <button id="addBtn">추가</button>
+        </div>
+        <p class="hint">💡 데모 팁: 목표가를 아주 크게(예: 99999999) 넣고 "지금 확인"을 누르면 알림이 바로 떠요.</p>
+      </div>
+
+      <div class="card">
+        <h2>👀 내 감시 목록</h2>
+        <div id="watchList" class="list"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>🔔 최근 알림</h2>
+          <button id="clearAlertsBtn" class="ghost small">전체 삭제</button>
+        </div>
+        <div id="alertList" class="list"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
