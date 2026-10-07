@@ -50,7 +50,7 @@ def generate_comment(query: str, current_price: int, target_price: int) -> str:
         resp = _openai_client().chat.completions.create(
             model=settings.openai_model,
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=512,  # thinking 모델(gemini 등)이 사고에 토큰을 써도 답이 남도록 여유
+            max_tokens=2048,  # thinking 모델(gemini 등)이 사고에 토큰을 써도 답이 남도록 여유
             temperature=0.7,
         )
         text = (resp.choices[0].message.content or "").strip()
