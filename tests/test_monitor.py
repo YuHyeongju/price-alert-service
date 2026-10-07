@@ -6,7 +6,12 @@ from datetime import timedelta
 
 from app.models import User, Watch
 from app.security import hash_password
-from app.services.monitor import check_watch, _condition_met, _in_cooldown
+from app.services.monitor import (
+    check_all_active_watches,
+    check_watch,
+    _condition_met,
+    _in_cooldown,
+)
 from app.services.price_source import ProductResult
 from app.utils import utcnow
 
@@ -108,3 +113,25 @@ def test_cooldown_prevents_duplicate_alert(db):
     # 쿨다운 경과 후 → 새 알림 발생
     later = check_watch(db, watch, source=FakeSource(90_000), now=t0 + timedelta(minutes=361))
     assert later.alert is not None
+
+
+# ---------------- check_all_active_watches ----------------
+class BrokenSource:
+    """특정 검색어에서만 예외를 던지는 소스 — 한 건 실패가 배치를 멈추는지 확인용."""
+
+    def search(self, query):
+        if query == "고장":
+            raise RuntimeError("boom")
+        return [ProductResult(title=f"{query} 정품", price=1_000, link="http://x", mall_name="몰")]
+
+
+def test_check_all_skips_inactive_and_survives_errors(db):
+    watch = _make_watch(db, target=100_000)               # 활성, 조건 충족 → 알림 1
+    db.add_all([
+        Watch(user_id=watch.user_id, query="꺼짐", target_price=100_000, comparison="lte",
+              channel="console", cooldown_minutes=360, is_active=False),   # 비활성 → 무시
+        Watch(user_id=watch.user_id, query="고장", target_price=100_000, comparison="lte",
+              channel="console", cooldown_minutes=360),                    # 예외 → 건너뜀
+    ])
+    db.commit()
+    assert check_all_active_watches(db, source=BrokenSource()) == 1
